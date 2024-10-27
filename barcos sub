@@ -1,0 +1,75 @@
+CREATE TABLE marinheiros (id_marin integer PRIMARY KEY, nome_marin VARCHAR (40), avaliacao integer, idade integer);
+
+INSERT INTO marinheiros VALUES (1,'Capitão Gancho', 8, 57),(2,'Alma Negra', 9, 37),
+			(3,'Jack Sparrow', 5, 35),(4,'Marujo Frajuto', 3, 42),(5,'Barba Branca', 10, 67);
+
+--INSERT INTO marinheiros VALUES (6,'Willy caolho', 8, 59)
+CREATE TABLE barcos (id_barco INTEGER PRIMARY KEY, nome_barco VARCHAR (40), cor VARCHAR(10));
+
+INSERT INTO barcos VALUES (1, 'Pérola Negra', 'Preto'), (2, 'Azul do Mar', 'Azul'),(3, 'Catraca voadora', 'Verde')
+			,(4, 'Sigano do Mar', 'Marron'),(5, 'Jóia do Oceano', 'Preto'),(6, 'Marinheiros Gayvotenses', 'Rosa');
+
+CREATE TABLE reservas (id_marin INTEGER REFERENCES marinheiros (id_marin), id_barco INTEGER REFERENCES barcos (id_barco), data_res date,
+			PRIMARY KEY (id_marin,id_barco,data_res));
+
+INSERT INTO reservas values (1,2,'01/01/2013'),(2,4,'07/04/2013'),(3,1,'05/06/2013'),(2,2,'07/08/2013'),(4,2,'05/03/2013'),
+(5,6,'24/10/2013'),(3,5,'08/02/2013'),(2,4,'12/08/2013'),(5,5,'03/04/2013'),(3,5,'07/04/2013'),(1,6,'25/09/2013');
+
+SELECT * FROM marinheiros;
+SELECT * FROM barcos;
+SELECT * FROM reservas;
+
+------------------------------------------------------
+select nome_marin, data_res FROM marinheiros m
+LEFT JOIN reservas r on m.d_marin = r.id_marin;
+where data_res is null;
+
+
+select * fom marinheiros
+
+insert into marinheiros values (6, 'Teste',8,40);
+
+select nome_barco,data_res FROM reservas r
+right join barcos b
+on b.id_barco = r.id_barco
+where data_res is null;
+
+
+
+--3-Utilizando sub consultas, retorne o nome de todos os marinheiros que reservaram algum barco----------------------------------------------------
+
+SELECT nome_marin from marinheiros m where m.id_marin in (
+select r.id_marin from reservas r
+);
+
+--4-Retorne o nome de todos os barcos que já foram reservados utilizando sub consultas.----------------------------------------------------------
+SELECT NOME_BARCO
+FROM BARCOS B
+WHERE B.ID_BARCO in
+		(SELECT R.ID_BARCO
+			FROM RESERVAS R);
+--5-Utilizando sub consultas, retorne o nome de todos os marinheiros que reservaram algum barco Marrom.-------------------------------------------------------------
+
+select nome_marin from marinheiros m where m.id_marin in (
+	select r.id_marin from reservas r where r.id_barco in (
+		select b.id_barco from barcos b where b.cor = 'Marron'
+)
+);
+
+--6-Utilizando sub consultas, retorne o nome de todos os marinheiros que reservaram algum barco Marrom ou Azul.---------------------------------------------------------------------------------------------------------------------------------
+select nome_marin from marinheiros m where m.id_marin in (
+select r.id_marin from reservas r where r.id_barco in (
+select b.id_barco from barcos b where b.cor in ('Marron','Azul')
+	)
+);
+
+--7-Utilizando sub consultas, retorne o nome de todos os marinheiros que reservaram algum barco Marrom E Azul. DICA: dois selects INTERNOS comparando id_marin, separados por AND.-------------------------------
+
+select nome_marin from marinheiros m where m.id_marin in (
+select r.id_marin from reservas r where r.id_barco in (
+	select b.id_barco from barcos b where b.cor = 'Marron' 
+	and r.id_marin in(
+	select b.id_barco from barcos b where b.cor = 'Azul'
+)
+	)
+);

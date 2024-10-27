@@ -1,0 +1,49 @@
+--01.Faça uma consulta que retorne o nome dos inquilinos que já alugaram algum imóvel, o nome do corretor e o tipo de imóvel alugado ordenado em ordem crescente da data de início da locação.
+
+select inq.nome as "Inquilino", cor.nome as "Corretor", imo.tipoImovel 
+from inquilino inq left join aluguel alu
+on alu.cpfInquilino = inq.cpf
+left join corretor cor 
+on cor.creci = alu.creciCorretor
+left join imovel imo
+on imo.idimovel = alu.idImovel
+where cor.nome is not null
+order by alu.dataIniLocacao;
+
+select inq.nome as "Inquilino", cor.nome as "Corretor", imo.tipoImovel 
+from inquilino inq right join aluguel alu
+on inq.cpf = alu.cpfinquilino
+left join corretor cor 
+on alu.crecicorretor = cor.creci
+left join imovel imo
+on imo.idimovel = alu.idImovel
+order by alu.dataIniLocacao;
+
+--02.Utilizando sub consultas, retorne o tipo de imóvel e a quantidade de cada tipo que tenha valor do aluguel maior que 900 reais que estão alugados.
+
+select imo.tipoimovel,count(imo.tipoImovel)  from imovel imo
+where imo.idimovel in (select alu.idImovel from aluguel alu where imo.preco > 900)
+group by imo.tipoimovel
+
+--03.Faça uma consulta que verifique se existem inquilinos que alugaram algum imóvel e que tenham o mesmo nome de corretores que também já alugaram.
+
+select inq.nome from inquilino inq
+right join aluguel alu
+on inq.cpf = alu.cpfInquilino
+where inq.nome in (select cor.nome from corretor cor, aluguel alu where cor.creci = alu.crecicorretor)
+--5.Faça uma consulta que retorne o nome dos clientes que não possuem telefone. Deve aparecer o nome deles e a coluna telefone (que deve ter os valores nulos).
+select cli.nome, telCli.telefone from cliente cli
+left join telefoneCliente telCli
+on telCli.codCliente = cli.codCliente
+where telCli.codCliente is null;
+
+--6. Faça uma consulta que retorne o gênero dos filmes e a quantidade de filmes de cada gênero que foi alugada.
+select fil.genero, count(fil.nome) from filme fil
+right join clienteAlugaExemplarFilme alu
+on alu.codFilme = fil.codFilme
+group by fil.genero;
+
+--7. Utilizando sub consultas, selecione o nome dos atores que fizeram algum filme de Ação ou de Drama.
+select ato.nome from ator ato
+where ato.idAtor in (select aef.idAtor from atorEstrelaFilme aef where aef.codFilme in 
+                    (select fil.codFilme from filme fil where genero = 'Ação' or genero = 'Drama'))
